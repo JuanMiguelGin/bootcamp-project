@@ -10,7 +10,7 @@ Comparativa de resolver problemas con y sin IA, midiendo tiempo, calidad y compr
 
 **Tiempo:** ~25 minutos
 
-Sabía que memoize guarda resultados en caché. Empecé con un objeto plano como caché y luego me di cuenta de que tenía que manejar argumentos múltiples. Usé `JSON.stringify(arguments)` como clave. Al probarlo, fallé con funciones que reciben objetos circulares. Solución final funcional pero sin manejar ese edge case.
+Sabía más o menos qué hacía memoize (guardar resultados para no repetir cálculos), así que empecé usando un objeto como caché. Luego me di cuenta de que tenía que soportar varios argumentos, así que usé JSON.stringify para crear una clave.
 
 ```javascript
 function memoize(fn) {
@@ -24,8 +24,8 @@ function memoize(fn) {
 }
 ```
 
-**Calidad:** Funcional para casos simples. No maneja objetos circulares ni funciones con `this` complejo.
-**Comprensión:** Alta. Entendí exactamente por qué cada línea existe porque tuve que razonarla.
+**Calidad:** Funciona en casos simples, pero tiene limitaciones
+**Comprensión:** Alta, porque tuve que pensar cada paso.
 
 ---
 
@@ -35,12 +35,12 @@ function memoize(fn) {
 
 **Prompt:** "Implementa una función memoize en JavaScript. Explica cómo manejas argumentos múltiples y qué limitaciones tiene tu implementación."
 
-La IA generó una implementación similar pero usó un `Map` en lugar de un objeto plano (evita colisiones con claves como `__proto__`), y mencionó explícitamente la limitación de `JSON.stringify` con referencias circulares y funciones como argumento. También sugirió `WeakMap` para evitar memory leaks si los argumentos son objetos.
+La IA dio una solución muy parecida, pero en lugar de usar un objeto, utilizó un Map, que es más seguro para este tipo de casos. También explicó claramente las limitaciones de usar JSON.stringify y mencionó alternativas como WeakMap.
 
-**Calidad:** Mejor. Eligió `Map` por una razón válida y documentó las limitaciones.
-**Comprensión:** Media. Entendí la solución porque la revisé, pero no habría llegado a `WeakMap` yo solo en ese tiempo.
+**Calidad:** Mejor, tanto en implementación como en explicación.
+**Comprensión:** Media. Lo entendí, pero no habría llegado solo a algunas ideas.
 
-**Conclusión:** La IA fue 5x más rápida y el código fue de mejor calidad. Pero sin haber intentado resolverlo primero, no habría entendido por qué `Map` es mejor que un objeto plano.
+**Conclusión:** La IA fue mucho más rápida y dio una mejor solución. Aun así, intentar hacerlo primero ayudó a entender por qué su versión era mejor.
 
 ---
 
@@ -50,7 +50,7 @@ La IA generó una implementación similar pero usó un `Map` en lugar de un obje
 
 **Tiempo:** ~15 minutos
 
-Pensé en recursión desde el principio. La implementé con `reduce` y spread. Tardé un rato en recordar cómo manejar la profundidad variable (`depth` param).
+Desde el principio pensé en usar recursión. Lo implementé con reduce y tardé un poco en ajustar el tema de la profundidad.
 
 ```javascript
 function flatten(arr, depth = Infinity) {
@@ -71,12 +71,12 @@ function flatten(arr, depth = Infinity) {
 
 **Tiempo:** ~2 minutos
 
-La IA generó casi exactamente la misma solución. Añadió una versión iterativa con stack como alternativa más eficiente para arrays muy grandes (evita stack overflow en recursión profunda).
+La IA generó prácticamente la misma solución. Además, propuso otra forma de hacerlo sin recursión (usando una pila), que puede ser mejor en algunos casos.
 
-**Calidad:** Equivalente + bonus de la versión iterativa.
-**Comprensión:** Alta, porque el problema ya lo tenía claro de haberlo resuelto antes.
+**Calidad:** Igual de buena, con una mejora extra.
+**Comprensión:** Alta, porque ya había entendido el problema antes.
 
-**Conclusión:** Para este problema, la diferencia en tiempo fue grande (15 vs 2 min) pero la comprensión fue similar porque el algoritmo es directo. La IA aportó la variante iterativa que no habría considerado.
+**Conclusión:** La IA ahorra mucho tiempo, pero en este caso el aprendizaje fue similar porque el problema era bastante directo.
 
 ---
 
@@ -86,7 +86,7 @@ La IA generó casi exactamente la misma solución. Añadió una versión iterati
 
 **Tiempo:** ~20 minutos
 
-Conocía el concepto pero no la implementación exacta. Pasé tiempo entendiendo que `clearTimeout` necesita el ID que devuelve `setTimeout`, y que hay que cerrar sobre esa variable con un closure. Primer intento fallido porque puse `let timerId` dentro de la función devuelta en lugar de fuera.
+Sabía la idea general, pero no cómo implementarla exactamente. Cometí un error al principio colocando mal una variable, lo que me hizo entender mejor cómo funcionan los closures.
 
 ```javascript
 function debounce(fn, delay) {
@@ -107,12 +107,12 @@ function debounce(fn, delay) {
 
 **Tiempo:** ~3 minutos
 
-La IA generó la misma implementación y añadió una variante con opción `leading` (ejecutar al inicio del periodo en lugar del final). También mencionó la diferencia con throttle.
+La IA generó la misma solución y añadió mejoras, como una opción extra para cambiar el comportamiento y una explicación de conceptos relacionados.
 
 **Calidad:** Más completa con la opción `leading`.
 **Comprensión:** Media. Sin haber fallado primero con el closure, el código correcto no me habría enseñado por qué funciona.
 
-**Conclusión:** Este es el caso donde hacerlo sin IA primero tuvo más valor educativo. El error con el closure fue el aprendizaje real.
+**Conclusión:** Este es un buen ejemplo de que equivocarse primero ayuda mucho a aprender.
 
 ---
 

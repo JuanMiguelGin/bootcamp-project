@@ -116,6 +116,18 @@
                     placeholder-stone-400 dark:placeholder-neutral-500
                     focus:outline-none focus:border-green-700
                     transition-colors duration-150" />
+      <label for="sortSelect" class="sr-only">Ordenar tareas</label>
+      <select id="sortSelect" aria-label="Ordenar tareas"
+              class="h-10 px-3 text-sm rounded-lg
+                     border border-stone-200 dark:border-neutral-600
+                     bg-white dark:bg-neutral-800
+                     text-neutral-900 dark:text-stone-100
+                     focus:outline-none focus:border-green-700
+                     transition-colors duration-150">
+        <option value="newest">Más nuevas</option>
+        <option value="oldest">Más antiguas</option>
+        <option value="completedLast">Completadas al final</option>
+      </select>
     </section>
  
     <!-- Acciones globales -->
@@ -220,6 +232,40 @@
               aria-label="Eliminar tarea">✕</button>
     </li>
   </template>
+
+  <!-- Modal confirmación de borrado -->
+  <div id="deleteModal" class="hidden fixed inset-0 z-[60]" aria-hidden="true">
+    <div id="deleteModalBackdrop" class="absolute inset-0 bg-black/40"></div>
+    <div class="absolute inset-0 flex items-center justify-center p-6">
+      <div role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle"
+           class="w-full max-w-sm rounded-2xl
+                  bg-white dark:bg-neutral-800
+                  border border-stone-200 dark:border-neutral-700
+                  shadow-xl p-5">
+        <h3 id="deleteModalTitle" class="text-sm font-bold tracking-tight">Eliminar tarea</h3>
+        <p class="mt-2 text-sm text-stone-500 dark:text-neutral-400">
+          ¿Seguro que quieres eliminar <span id="deleteModalTaskTitle" class="font-semibold text-stone-700 dark:text-stone-200"></span>?
+        </p>
+        <div class="mt-4 flex justify-end gap-2">
+          <button id="deleteModalCancel"
+                  class="h-10 px-3 rounded-lg text-sm font-medium
+                         border border-stone-200 dark:border-neutral-600
+                         text-stone-600 dark:text-neutral-300
+                         hover:bg-stone-100 dark:hover:bg-neutral-700
+                         transition-colors duration-150">
+            Cancelar
+          </button>
+          <button id="deleteModalConfirm"
+                  class="h-10 px-3 rounded-lg text-sm font-semibold text-white
+                         bg-red-600 hover:bg-red-700 active:scale-95
+                         transition-all duration-150
+                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400">
+            Eliminar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
  
   <script src="app.js"></script>
 </body>

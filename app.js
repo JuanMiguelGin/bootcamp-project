@@ -7,6 +7,7 @@
 let tasks  = [];   // array de objetos { id, title, completed, createdAt }
 let filter = "all"; // "all" | "pending" | "completed"
 let search = "";    // texto de búsqueda
+let sortOrder = "newest"; // "newest" | "oldest" | "completedLast"
  
 // ── 2. REFERENCIAS AL DOM ───────────────────────────────────
 const taskForm          = document.getElementById("taskForm");
@@ -14,6 +15,7 @@ const taskInput         = document.getElementById("taskInput");
 const taskList          = document.getElementById("taskList");
 const emptyMsg          = document.getElementById("emptyMsg");
 const searchInput       = document.getElementById("searchInput");
+const sortSelect        = document.getElementById("sortSelect");
 const markAllBtn        = document.getElementById("markAllBtn");
 const clearCompletedBtn = document.getElementById("clearCompletedBtn");
 const darkToggle        = document.getElementById("darkToggle");
@@ -24,6 +26,14 @@ const statCompleted     = document.getElementById("statCompleted");
 const progressFill      = document.getElementById("progressFill");
 const progressLabel     = document.getElementById("progressLabel");
 const filterBtns        = document.querySelectorAll(".filter-btn");
+
+// Modal de confirmación de borrado
+const deleteModal          = document.getElementById("deleteModal");
+const deleteModalBackdrop  = document.getElementById("deleteModalBackdrop");
+const deleteModalTaskTitle = document.getElementById("deleteModalTaskTitle");
+const deleteModalCancel    = document.getElementById("deleteModalCancel");
+const deleteModalConfirm   = document.getElementById("deleteModalConfirm");
+let pendingDeleteId = null;
  
 // ── 3. LOCALSTORAGE ─────────────────────────────────────────
 function saveTasks() {
@@ -93,6 +103,20 @@ function deleteTask(id) {
   saveTasks();
   render();
 }
+
+function openDeleteModal(task) {
+  pendingDeleteId = task.id;
+  deleteModalTaskTitle.textContent = `“${task.title}”`;
+  deleteModal.classList.remove("hidden");
+  deleteModal.setAttribute("aria-hidden", "false");
+  deleteModalCancel.focus();
+}
+
+function closeDeleteModal() {
+  pendingDeleteId = null;
+  deleteModal.classList.add("hidden");
+  deleteModal.setAttribute("aria-hidden", "true");
+}
  
 // ── 8. MARCAR / DESMARCAR ───────────────────────────────────
 function toggleTask(id) {
@@ -129,8 +153,39 @@ function clearCompleted() {
 }
  
 // ── 12. FILTRAR Y BUSCAR ─────────────────────────────────────
+function sortTasks(inputTasks) {
+  const decorated = inputTasks.map((t, idx) => ({ t, idx }));
+
+  decorated.sort((a, b) => {
+    const aTime = new Date(a.t.createdAt).getTime();
+    const bTime = new Date(b.t.createdAt).getTime();
+
+    if (sortOrder === "newest") {
+      if (bTime !== aTime) return bTime - aTime;
+      return a.idx - b.idx;
+    }
+
+    if (sortOrder === "oldest") {
+      if (aTime !== bTime) return aTime - bTime;
+      return a.idx - b.idx;
+    }
+
+    if (sortOrder === "completedLast") {
+      const aDone = a.t.completed ? 1 : 0;
+      const bDone = b.t.completed ? 1 : 0;
+      if (aDone !== bDone) return aDone - bDone;
+      if (bTime !== aTime) return bTime - aTime;
+      return a.idx - b.idx;
+    }
+
+    return a.idx - b.idx;
+  });
+
+  return decorated.map(x => x.t);
+}
+
 function getVisibleTasks() {
-  return tasks.filter(t => {
+  const filtered = tasks.filter(t => {
     const matchesFilter =
       filter === "all" ||
       (filter === "pending"   && !t.completed) ||
@@ -141,6 +196,9 @@ function getVisibleTasks() {
  
     return matchesFilter && matchesSearch;
   });
+
+  // Ojo: Array.sort muta, por eso ordenamos una copia
+  return sortTasks(filtered.slice());
 }
  
 // ── 13. ESTADÍSTICAS ─────────────────────────────────────────
@@ -190,7 +248,7 @@ function render() {
  
     // Eliminar
     li.querySelector(".task-delete").addEventListener("click", () =>
-      deleteTask(task.id)
+      openDeleteModal(task)
     );
  
     taskList.appendChild(li);
@@ -238,6 +296,12 @@ searchInput.addEventListener("input", e => {
   search = e.target.value;
   render();
 });
+
+// Cambiar ordenación
+sortSelect.addEventListener("change", e => {
+  sortOrder = e.target.value;
+  render();
+});
  
 // Cambiar filtro activo
 filterBtns.forEach(btn => {
@@ -261,8 +325,22 @@ darkToggle.addEventListener("click", () => {
   applyDarkMode(isDark);
   saveDarkMode(isDark);
 });
+
+// Modal borrar: cancelar/confirmar/cerrar
+deleteModalCancel.addEventListener("click", closeDeleteModal);
+deleteModalBackdrop.addEventListener("click", closeDeleteModal);
+deleteModalConfirm.addEventListener("click", () => {
+  if (pendingDeleteId != null) deleteTask(pendingDeleteId);
+  closeDeleteModal();
+});
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && !deleteModal.classList.contains("hidden")) {
+    closeDeleteModal();
+  }
+});
  
 // ── 17. ARRANQUE ─────────────────────────────────────────────
 loadTasks();
 applyDarkMode(loadDarkMode());  // restaurar preferencia guardada
+if (sortSelect) sortSelect.value = sortOrder;
 render();

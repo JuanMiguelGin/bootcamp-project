@@ -14,7 +14,7 @@
 //      con un código de error (4xx / 5xx)
 // ─────────────────────────────────────────────────────────────
 
-const API_BASE = "http://localhost:3000/api/v1";
+const API_BASE = "/api/v1";
 
 /**
  * Helper interno: ejecuta fetch y normaliza errores HTTP.
